@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code Pilot Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<style>
+  :root {
+    --paper:      #f1f3ef;
+    --panel:      #fbfcfa;
+    --panel-2:    #e9ece6;
+    --ink:        #161b1a;
+    --ink-2:      #4a534d;
+    --muted:      #7d8880;
+    --line:       #d5dad2;
+    --line-strong:#b7bfb3;
+    --accent:     #b07417;
+    --accent-soft:rgba(176,116,23,0.13);
+    --good:       #2c7a4e;
+    --bad:        #a3402c;
+    --cat-opus:      #223b52;
+    --cat-sonnet:    #b07417;
+    --cat-haiku:     #5c7a63;
+    --cat-other:     #8a8478;
+    --cat-input:     #cdd1c6;
+    --cat-output:    #4a534d;
+    --cat-cacheread: #93a89c;
+    --cat-cachewrite:#a3402c;
+    --heat-0: #e7eae2;
+    --heat-1: #d3d9c6;
+    --heat-2: #b9c7a1;
+    --heat-3: #e0b467;
+    --heat-4: #cf8a2f;
+    --heat-5: #b0641c;
+    --heat-6: #7d3712;
+    --shadow: 0 6px 24px rgba(22,27,26,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #12100b;
+      --panel:      #1b1814;
+      --panel-2:    #221e18;
+      --ink:        #f1efe9;
+      --ink-2:      #c2beb1;
+      --muted:      #8b8578;
+      --line:       #332e26;
+      --line-strong:#463f33;
+      --accent:     #dc9b3d;
+      --accent-soft:rgba(220,155,61,0.16);
+      --good:       #57b57e;
+      --bad:        #dd7c62;
+      --cat-opus:      #6a8db0;
+      --cat-sonnet:    #dc9b3d;
+      --cat-haiku:     #8bab8f;
+      --cat-other:     #9a9384;
+      --cat-input:     #454236;
+      --cat-output:    #b7b2a2;
+      --cat-cacheread: #5f7368;
+      --cat-cachewrite:#dd7c62;
+      --heat-0: #221f19;
+      --heat-1: #33301f;
+      --heat-2: #4a4526;
+      --heat-3: #6b4d24;
+      --heat-4: #8f5f20;
+      --heat-5: #b57424;
+      --heat-6: #dc9b3d;
+      --shadow: 0 6px 24px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #12100b;
+    --panel:      #1b1814;
+    --panel-2:    #221e18;
+    --ink:        #f1efe9;
+    --ink-2:      #c2beb1;
+    --muted:      #8b8578;
+    --line:       #332e26;
+    --line-strong:#463f33;
+    --accent:     #dc9b3d;
+    --accent-soft:rgba(220,155,61,0.16);
+    --good:       #57b57e;
+    --bad:        #dd7c62;
+    --cat-opus:      #6a8db0;
+    --cat-sonnet:    #dc9b3d;
+    --cat-haiku:     #8bab8f;
+    --cat-other:     #9a9384;
+    --cat-input:     #454236;
+    --cat-output:    #b7b2a2;
+    --cat-cacheread: #5f7368;
+    --cat-cachewrite:#dd7c62;
+    --heat-0: #221f19;
+    --heat-1: #33301f;
+    --heat-2: #4a4526;
+    --heat-3: #6b4d24;
+    --heat-4: #8f5f20;
+    --heat-5: #b57424;
+    --heat-6: #dc9b3d;
+    --shadow: 0 6px 24px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 28px 72px; }
+
+  /* ---------- masthead ---------- */
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 22px; }
+  .masthead .top-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+  }
+  h1 { font-size: 28px; font-weight: 700; margin: 6px 0 0; letter-spacing: -0.015em; text-wrap: balance; }
+  .register-no { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); text-align: right; white-space: nowrap; }
+  .subhead { color: var(--ink-2); margin: 10px 0 0; max-width: 68ch; font-size: 13.5px; }
+
+  /* ---------- filters ---------- */
+  .filters {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    margin: 22px 0 28px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .filter-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .filter-label { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+  .seg { display: inline-flex; gap: 2px; }
+  .seg button {
+    appearance: none; border: 1px solid var(--line); background: var(--panel); color: var(--ink-2);
+    font: inherit; font-size: 12px; font-weight: 500; padding: 5px 11px; cursor: pointer; margin-left: -1px;
+  }
+  .seg button:first-child { margin-left: 0; }
+  .seg button:hover { color: var(--ink); border-color: var(--line-strong); position: relative; z-index: 1; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); font-weight: 600; position: relative; z-index: 2; }
+  .seg button:focus-visible, .chip:focus-visible, table.dt th:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; position: relative; z-index: 3; }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    appearance: none; border: 1px solid var(--line); background: var(--panel); color: var(--ink-2);
+    font: inherit; font-size: 11.5px; font-weight: 500; padding: 4px 10px; cursor: pointer; border-radius: 2px;
+  }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .range-note { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  /* ---------- KPI ledger strip ---------- */
+  .ledger {
+    display: flex; flex-wrap: wrap; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+    margin-bottom: 40px;
+  }
+  .stat { flex: 1 1 150px; padding: 14px 18px; border-left: 1px solid var(--line); min-width: 0; }
+  .stat:first-child { border-left: none; }
+  .stat .k-label { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .stat .k-value { font-family: "IBM Plex Mono", monospace; font-size: 24px; font-weight: 600; letter-spacing: -0.01em; margin-top: 3px; }
+  .stat .k-value.accent { color: var(--accent); }
+  .stat .k-sub { font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+
+  /* ---------- sections ---------- */
+  section { margin-bottom: 48px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--line-strong); padding-bottom: 10px; margin-bottom: 18px; }
+  .sec-head .num { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .sec-head h2 { font-size: 17px; font-weight: 700; margin: 0; letter-spacing: -0.005em; }
+  .sec-note { font-size: 12.5px; color: var(--ink-2); margin: -10px 0 18px; max-width: 74ch; }
+
+  .grid2 { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 22px; align-items: start; }
+  .grid2.even { grid-template-columns: 1fr 1fr; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 3px;
+    padding: 16px 18px 14px; min-width: 0;
+  }
+  .panel.full { grid-column: 1 / -1; }
+  .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .panel-head h3 { font-size: 13px; font-weight: 650; margin: 0; }
+  .panel-head .sub { font-size: 11.5px; color: var(--muted); margin: 2px 0 0; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 10px 0 2px; font-size: 11.5px; color: var(--ink-2); }
+  .legend .key { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 9px; height: 9px; flex: none; }
+
+  svg text { font-family: "Public Sans", sans-serif; }
+  svg .mono-t { font-family: "IBM Plex Mono", monospace; }
+  .axis-t { font-size: 10px; fill: var(--muted); }
+  .gridline { stroke: var(--line); stroke-width: 1; }
+  .chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  /* horizontal bar rows (CSS-based, not SVG) */
+  .hbars { display: flex; flex-direction: column; gap: 9px; }
+  .hbar-row { display: grid; grid-template-columns: 120px 1fr auto; align-items: center; gap: 10px; }
+  .hbar-row .hb-label { font-size: 12px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar-row .hb-track { position: relative; height: 14px; background: var(--panel-2); }
+  .hbar-row .hb-fill { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+  .hbar-row .hb-val { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--ink-2); white-space: nowrap; text-align: right; }
+
+  /* stacked bar (cost anatomy) */
+  .stack-bar { display: flex; height: 26px; width: 100%; border: 1px solid var(--line-strong); overflow: hidden; }
+  .stack-bar .seg-block { height: 100%; }
+  .stack-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 10px; font-size: 12px; }
+  .stack-legend .key { display: flex; align-items: center; gap: 7px; }
+  .stack-legend .swatch { width: 10px; height: 10px; flex: none; }
+  .stack-legend .amt { font-family: "IBM Plex Mono", monospace; font-weight: 600; margin-left: 4px; }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; }
+  table.dt { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  table.dt th, table.dt td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  table.dt th:first-child, table.dt td:first-child { text-align: left; }
+  table.dt th {
+    color: var(--muted); font-weight: 600; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--line-strong); cursor: pointer; user-select: none;
+  }
+  table.dt th.active { color: var(--accent); }
+  table.dt td { color: var(--ink-2); font-family: "IBM Plex Mono", monospace; }
+  table.dt td:first-child { color: var(--ink); font-family: "Public Sans", sans-serif; }
+  table.dt .team-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); font-family: "Public Sans", sans-serif; }
+  table.dt tbody tr:hover { background: var(--panel-2); }
+
+  /* heatmap */
+  .heatmap-wrap { display: grid; grid-template-columns: 34px 1fr; gap: 4px; }
+  .heatmap-grid { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; }
+  .heatmap-rows { display: grid; grid-template-rows: repeat(7, 1fr); gap: 2px; }
+  .hm-daylabel { font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--muted); display: flex; align-items: center; height: 100%; }
+  .hm-cell { aspect-ratio: 1; border-radius: 1px; }
+  .hm-hourlabels { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; margin-top: 4px; grid-column: 2; }
+  .hm-hourlabels span { font-family: "IBM Plex Mono", monospace; font-size: 8.5px; color: var(--muted); text-align: center; }
+  .hm-scale { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 10.5px; color: var(--muted); }
+  .hm-scale .ramp { display: flex; height: 8px; flex: 0 0 110px; }
+  .hm-scale .ramp i { flex: 1; }
+
+  /* asides / callouts */
+  .callout {
+    border-left: 2px solid var(--accent); background: var(--panel); border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 12px 16px; margin-top: 16px; font-size: 12.5px; color: var(--ink-2);
+  }
+  .callout strong { color: var(--ink); font-weight: 650; }
+
+  .stories { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .story {
+    border-top: 2px solid var(--line-strong); padding-top: 10px; font-size: 12.5px; color: var(--ink-2); line-height: 1.55;
+  }
+  .story .st-name { font-size: 13px; font-weight: 650; color: var(--ink); }
+  .story .st-dates { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted); margin-bottom: 6px; }
+  .story strong { color: var(--ink); font-weight: 650; }
+  .story .mono { color: var(--ink); }
+
+  footer { margin-top: 48px; padding-top: 18px; border-top: 2px solid var(--ink); color: var(--muted); font-size: 11.5px; line-height: 1.6; max-width: 80ch; }
+  footer code { font-family: "IBM Plex Mono", monospace; background: var(--panel-2); padding: 1px 4px; border-radius: 2px; }
+
+  #tip {
+    position: fixed; z-index: 50; pointer-events: none; display: none;
+    background: var(--panel); border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow); padding: 8px 11px; font-size: 12px; min-width: 130px;
+  }
+  #tip .tt-title { font-family: "IBM Plex Mono", monospace; color: var(--muted); font-size: 10.5px; margin-bottom: 5px; }
+  #tip .tt-row { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+  #tip .tt-key { width: 8px; height: 8px; flex: none; }
+  #tip .tt-val { font-family: "IBM Plex Mono", monospace; font-weight: 650; color: var(--ink); margin-left: auto; padding-left: 14px; }
+  #tip .tt-name { color: var(--ink-2); }
+
+  .empty-note { font-size: 12.5px; color: var(--muted); padding: 20px 4px; text-align: center; }
+
+  @media (max-width: 860px) {
+    .grid2, .grid2.even { grid-template-columns: 1fr; }
+    .stories { grid-template-columns: 1fr; }
+    .ledger { flex-direction: column; }
+    .stat { border-left: none; border-top: 1px solid var(--line); }
+    .stat:first-child { border-top: none; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">City of Boston &middot; Digital Services &middot; Claude Code pilot</div>
+        <h1>Usage &amp; Cost Register</h1>
+      </div>
+      <div class="register-no" id="registerNo"></div>
+    </div>
+    <p class="subhead">Compiled from AWS Bedrock model-invocation logs: token counts, timestamps, model IDs, and tool names only. No prompt or response content is read or shown. Team assignment comes from each IAM user's <code class="mono">Team</code> tag.</p>
+  </div>
+
+  <div class="filters" role="group" aria-label="Dashboard filters">
+    <div class="filter-group">
+      <span class="filter-label">Window</span>
+      <div class="seg" id="rangeSeg">
+        <button data-days="7">7d</button>
+        <button data-days="30">30d</button>
+        <button data-days="90">90d</button>
+        <button data-days="full" aria-pressed="true">Full pilot</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Team</span>
+      <div class="chip-row" id="teamChips"></div>
+    </div>
+    <span class="range-note" id="rangeNote"></span>
+  </div>
+
+  <div class="ledger" id="kpis"></div>
+
+  <section>
+    <div class="sec-head"><span class="num">01</span><h2>How much, who, and when</h2></div>
+    <p class="sec-note">Daily spend is estimated from token counts at current Bedrock on-demand list prices, grouped by model family. Per-user cost is normalized by active days to separate heavy adopters from one intense week.</p>
+    <div class="panel full" id="card-daily" style="margin-bottom:22px;"></div>
+    <div class="grid2">
+      <div class="panel" id="card-users"></div>
+      <div class="panel" id="card-teams"></div>
+    </div>
+    <div class="callout" id="insight-spend"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">02</span><h2>Where the dollars actually go</h2></div>
+    <p class="sec-note">Agentic sessions re-read the whole conversation every turn, so cache reads and writes &mdash; not typed prompts &mdash; dominate cost. A 5-minute cache write carries a 1.25&times; premium; a cache that expires between turns gets re-written from scratch.</p>
+    <div class="grid2 even">
+      <div class="panel" id="card-anatomy"></div>
+      <div class="panel" id="card-cache"></div>
+    </div>
+    <div class="callout" id="insight-cost"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">03</span><h2>How people actually use Claude Code</h2></div>
+    <p class="sec-note">Sessions are reconstructed by grouping each user's invocations into runs with less than 30 minutes between calls. Tool names are parsed from response payloads; hours are local America/New_York time.</p>
+    <div class="panel full" id="card-activity" style="margin-bottom:22px;"></div>
+    <div class="grid2">
+      <div class="panel" id="card-heat"></div>
+      <div class="panel" id="card-tools"></div>
+    </div>
+    <div class="callout" id="insight-usage"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">04</span><h2>What the pilot is used for</h2></div>
+    <p class="sec-note"><strong>Partly illustrative.</strong> Tool-call frequency (left) is real and shows workflows skew toward direct file/code manipulation over broad search. Turning that into named, shareable "skills" needs a one-time classification pass over session-opening prompts, which has not been run &mdash; the table on the right shows the intended output shape, not a real finding.</p>
+    <div class="grid2 even">
+      <div class="panel" id="card-tool-detail"></div>
+      <div class="panel" id="card-skills">
+        <div class="panel-head">
+          <div>
+            <h3>Candidate skills from repeated workflows</h3>
+            <p class="sub">Illustrative &mdash; requires the prompt-mining pass</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr><th>Recurring pattern</th><th>Users</th><th>Sessions</th><th>Suggested action</th></tr></thead>
+            <tbody id="skillsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">05</span><h2>In office versus remote</h2></div>
+    <p class="sec-note">Staff are in office Monday&ndash;Wednesday and remote Thursday&ndash;Friday. Comparing those two blocks shows whether Claude Code usage shifts with work location.</p>
+    <div class="panel full" id="card-week-pattern" style="margin-bottom:22px;"></div>
+    <div class="grid2 even">
+      <div class="panel" id="card-office-remote"></div>
+      <div class="panel" id="card-office-remote-hours"></div>
+    </div>
+    <div class="callout" id="insight-office-remote"></div>
+  </section>
+
+  <footer id="footerNote"></footer>
+</div>
+
+<div id="tip" role="status"></div>
+
+<script>
+const DATA = /*__DASHBOARD_DATA__*/__DATA__/*__END_DASHBOARD_DATA__*/;
+
+/* ---------------- formatting helpers ---------------- */
+const fmtUSD = n => {
+  if (Math.abs(n) >= 1000) return '$' + Math.round(n).toLocaleString('en-US');
+  return '$' + n.toFixed(n >= 100 ? 0 : n >= 10 ? 1 : 2);
+};
+const fmtUSDp = n => '$' + n.toFixed(2);
+const fmtInt = n => Math.round(n).toLocaleString('en-US');
+const fmtTok = n => {
+  if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(Math.round(n));
+};
+const fmtPct = n => (n * 100).toFixed(1) + '%';
+const fmtDate = d => { const [y,m,day] = d.split('-'); const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return MO[+m-1] + ' ' + +day; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------------- state ---------------- */
+const state = { rangeDays: 'full', teams: new Set() };
+const ALL_TEAMS = Array.from(new Set(DATA.records.map(r => r.t))).sort();
+state.teams = new Set(ALL_TEAMS);
+
+const pilotEnd = new Date(DATA.kpis.pilot_end + 'T23:59:59Z');
+const pilotStart = new Date(DATA.kpis.pilot_start + 'T00:00:00Z');
+
+function filteredRecords() {
+  let cutoff = null;
+  if (state.rangeDays !== 'full') cutoff = new Date(pilotEnd.getTime() - state.rangeDays * 86400000);
+  return DATA.records.filter(r => {
+    if (cutoff && new Date(r.ts) < cutoff) return false;
+    if (!state.teams.has(r.t)) return false;
+    return true;
+  });
+}
+
+/* ---------------- aggregation helpers ---------------- */
+function groupSum(recs, keyFn) {
+  const m = new Map();
+  for (const r of recs) {
+    const k = keyFn(r);
+    if (!m.has(k)) m.set(k, { calls: 0, cost: 0, it: 0, ot: 0, rt: 0, wt: 0, ic: 0, oc: 0, rc: 0, wc: 0, users: new Set(), days: new Set(), tools: new Map() });
+    const b = m.get(k);
+    b.calls++; b.it += r.it; b.ot += r.ot; b.rt += r.rt; b.wt += r.wt;
+    b.ic += r.ic; b.oc += r.oc; b.rc += r.rc; b.wc += r.wc;
+    b.cost += r.ic + r.oc + r.rc + r.wc;
+    b.users.add(r.u); b.days.add(r.d);
+    if (r.tl) for (const t of r.tl) b.tools.set(t, (b.tools.get(t) || 0) + 1);
+  }
+  return m;
+}
+
+function sessionsByUser(recs) {
+  const byUser = new Map();
+  for (const r of recs) {
+    if (!byUser.has(r.u)) byUser.set(r.u, []);
+    byUser.get(r.u).push(r.ts);
+  }
+  const gapMs = (DATA.meta.session_gap_minutes || 30) * 60000;
+  const out = new Map();
+  for (const [u, tss] of byUser) {
+    tss.sort();
+    let n = tss.length ? 1 : 0;
+    for (let i = 1; i < tss.length; i++) {
+      if (new Date(tss[i]) - new Date(tss[i - 1]) > gapMs) n++;
+    }
+    out.set(u, n);
+  }
+  return out;
+}
+
+/* ---------------- chart primitives (SVG time series) ---------------- */
+function timeSeriesSVG(dates, series, opts) {
+  const W = opts.width || 1000, H = opts.height || 220;
+  const padL = opts.padL || 46, padR = 14, padT = 14, padB = 26;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const n = dates.length;
+  const stacked = !!opts.stacked;
+  let maxV = 0;
+  if (stacked) {
+    for (let i = 0; i < n; i++) {
+      let sum = 0;
+      for (const s of series) sum += s.values[i];
+      if (sum > maxV) maxV = sum;
+    }
+  } else {
+    for (const s of series) for (const v of s.values) if (v > maxV) maxV = v;
+  }
+  maxV = maxV <= 0 ? 1 : maxV * 1.18;
+  const x = i => padL + (n <= 1 ? innerW / 2 : (i / (n - 1)) * innerW);
+  const y = v => padT + innerH - (v / maxV) * innerH;
+
+  let gridSVG = '', ticks = 4;
+  for (let t = 0; t <= ticks; t++) {
+    const v = (maxV / ticks) * t;
+    const yy = y(v);
+    gridSVG += `<line x1="${padL}" x2="${W - padR}" y1="${yy}" y2="${yy}" class="gridline"/>`;
+    gridSVG += `<text x="${padL - 8}" y="${yy + 3}" text-anchor="end" class="axis-t mono-t">${opts.yFmt ? opts.yFmt(v) : fmtTok(v)}</text>`;
+  }
+
+  const xFmt = opts.xFmt || fmtDate;
+  let xLabels = '';
+  const step = Math.max(1, Math.round(n / (opts.xTicks || 7)));
+  for (let i = 0; i < n; i += step) {
+    xLabels += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle" class="axis-t mono-t">${xFmt(dates[i])}</text>`;
+  }
+
+  let paths = '', dots = '';
+  if (stacked) {
+    let base = new Array(n).fill(0);
+    for (const s of series) {
+      const top = base.map((b, i) => b + s.values[i]);
+      let d = `M ${x(0)} ${y(base[0])}`;
+      for (let i = 1; i < n; i++) d += ` L ${x(i)} ${y(base[i])}`;
+      for (let i = n - 1; i >= 0; i--) d += ` L ${x(i)} ${y(top[i])}`;
+      d += ' Z';
+      paths += `<path d="${d}" fill="${s.color}" fill-opacity="0.88" data-series="${esc(s.label)}"></path>`;
+      base = top;
+    }
+  } else {
+    for (const s of series) {
+      let d = `M ${x(0)} ${y(s.values[0])}`;
+      for (let i = 1; i < n; i++) d += ` L ${x(i)} ${y(s.values[i])}`;
+      let area = d + ` L ${x(n - 1)} ${y(0)} L ${x(0)} ${y(0)} Z`;
+      paths += `<path d="${area}" fill="${s.color}" fill-opacity="0.16"></path>`;
+      paths += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2"></path>`;
+      for (let i = 0; i < n; i++) {
+        dots += `<circle cx="${x(i)}" cy="${y(s.values[i])}" r="7" fill="transparent" class="hit-dot" data-i="${i}" data-series="${esc(s.label)}"></circle>`;
+      }
+    }
+  }
+
+  const svg = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" data-w="${W}" data-h="${H}">
+    ${gridSVG}${paths}${xLabels}${dots}
+  </svg>`;
+  return svg;
+}
+
+function attachSeriesTooltip(el, dates, series, opts) {
+  const tip = document.getElementById('tip');
+  const xFmt = opts.xFmt || fmtDate;
+  el.querySelectorAll('.hit-dot').forEach(dot => {
+    dot.addEventListener('mousemove', e => {
+      const i = +dot.getAttribute('data-i');
+      let rows = '';
+      for (const s of series) {
+        rows += `<div class="tt-row"><span class="tt-key" style="background:${s.color}"></span><span class="tt-name">${esc(s.label)}</span><span class="tt-val">${opts.yFmt ? opts.yFmt(s.values[i]) : fmtTok(s.values[i])}</span></div>`;
+      }
+      tip.innerHTML = `<div class="tt-title">${xFmt(dates[i])}</div>${rows}`;
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top = (e.clientY + 14) + 'px';
+    });
+    dot.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+  });
+}
+
+/* ---------------- horizontal bars (CSS) ---------------- */
+function hbarRows(items, opts) {
+  const max = Math.max(1, ...items.map(i => i.value));
+  return items.map(it => `
+    <div class="hbar-row">
+      <div class="hb-label" title="${esc(it.label)}">${esc(it.label)}</div>
+      <div class="hb-track"><div class="hb-fill" style="width:${(it.value / max * 100).toFixed(1)}%; background:${it.color || 'var(--accent)'}"></div></div>
+      <div class="hb-val">${it.valueLabel}</div>
+    </div>`).join('');
+}
+
+/* ---------------- render functions ---------------- */
+function renderKPIs(recs) {
+  const cost = recs.reduce((a, r) => a + r.ic + r.oc + r.rc + r.wc, 0);
+  const users = new Set(recs.map(r => r.u));
+  const teams = new Set(recs.map(r => r.t));
+  const sess = sessionsByUser(recs);
+  const totalSessions = Array.from(sess.values()).reduce((a, b) => a + b, 0);
+  const inputSideTok = recs.reduce((a, r) => a + r.it + r.rt + r.wt, 0);
+  const cacheTok = recs.reduce((a, r) => a + r.rt + r.wt, 0);
+  const allTok = inputSideTok + recs.reduce((a, r) => a + r.ot, 0);
+
+  const stats = [
+    ['Estimated spend', fmtUSD(cost), users.size ? fmtUSDp(cost / users.size) + ' / user' : '', true],
+    ['Invocations', fmtInt(recs.length), totalSessions ? fmtInt(totalSessions) + ' sessions' : ''],
+    ['Active users', fmtInt(users.size), fmtInt(teams.size) + ' teams'],
+    ['Cache share of input tokens', fmtPct(inputSideTok ? cacheTok / inputSideTok : 0), fmtTok(allTok) + ' tokens total'],
+  ];
+  document.getElementById('kpis').innerHTML = stats.map(([label, val, sub, accent]) => `
+    <div class="stat">
+      <div class="k-label">${label}</div>
+      <div class="k-value${accent ? ' accent' : ''}">${val}</div>
+      <div class="k-sub">${sub || '&nbsp;'}</div>
+    </div>`).join('');
+}
+
+function renderDaily(recs) {
+  const byDay = groupSum(recs, r => r.d);
+  const dates = Array.from(byDay.keys()).sort();
+  const el = document.getElementById('card-daily');
+  if (!dates.length) { el.innerHTML = emptyPanel('Daily spend', 'No invocations in this window.'); return; }
+  const values = dates.map(d => { const b = byDay.get(d); return b.ic + b.oc + b.rc + b.wc; });
+  el.innerHTML = `
+    <div class="panel-head"><div><h3>Daily estimated spend</h3><p class="sub">Bedrock list-price estimate, all selected teams</p></div></div>
+    <div id="dailyChart"></div>`;
+  const seriesResolved = [{ label: 'Spend', color: getVar('--accent'), values }];
+  const svgHtml = timeSeriesSVG(dates, seriesResolved, { height: 220, yFmt: fmtUSD, xTicks: 8 });
+  document.getElementById('dailyChart').innerHTML = svgHtml;
+  attachSeriesTooltip(document.getElementById('dailyChart'), dates, seriesResolved, { yFmt: fmtUSD });
+}
+
+function renderUsers(recs) {
+  const byUser = groupSum(recs, r => r.u);
+  const sess = sessionsByUser(recs);
+  const rows = Array.from(byUser.entries()).map(([u, b]) => {
+    const team = recs.find(r => r.u === u).t;
+    return { user: u, team, calls: b.calls, sessions: sess.get(u) || 0, days: b.days.size, cost: b.cost, perDay: b.days.size ? b.cost / b.days.size : 0 };
+  }).sort((a, b) => b.cost - a.cost);
+
+  const el = document.getElementById('card-users');
+  if (!rows.length) { el.innerHTML = emptyPanel('Spend by user', 'No invocations in this window.'); return; }
+  el.innerHTML = `
+    <div class="panel-head"><div><h3>Spend by user</h3><p class="sub">Ranked by estimated cost, top ${Math.min(12, rows.length)} of ${rows.length}</p></div></div>
+    <div class="table-wrap"><table class="dt">
+      <thead><tr><th>User</th><th>Team</th><th>Sessions</th><th>Active days</th><th>Cost</th><th>$/active day</th></tr></thead>
+      <tbody>${rows.slice(0, 12).map(r => `
+        <tr>
+          <td>${esc(r.user)}</td>
+          <td class="team-tag">${esc(r.team)}</td>
+          <td>${fmtInt(r.sessions)}</td>
+          <td>${fmtInt(r.days)}</td>
+          <td>${fmtUSD(r.cost)}</td>
+          <td>${fmtUSDp(r.perDay)}</td>
+        </tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+function renderTeams(recs) {
+  const byTeam = groupSum(recs, r => r.t);
+  const rows = Array.from(byTeam.entries()).map(([t, b]) => ({ team: t, cost: b.cost, users: b.users.size })).sort((a, b) => b.cost - a.cost);
+  const el = document.getElementById('card-teams');
+  if (!rows.length) { el.innerHTML = emptyPanel('Spend by team', 'No invocations in this window.'); return; }
+  el.innerHTML = `
+    <div class="panel-head"><div><h3>Spend by team</h3><p class="sub">IAM <code class="mono">Team</code> tag</p></div></div>
+    <div class="hbars">${hbarRows(rows.map(r => ({ label: r.team, value: r.cost, valueLabel: `${fmtUSD(r.cost)} &middot; ${r.users}u` })))}</div>`;
+}
+
+function renderAnatomy(recs) {
+  const totals = recs.reduce((a, r) => { a.ic += r.ic; a.oc += r.oc; a.rc += r.rc; a.wc += r.wc; return a; }, { ic: 0, oc: 0, rc: 0, wc: 0 });
+  const total = totals.ic + totals.oc + totals.rc + totals.wc || 1;
+  const parts = [
+    ['Uncached input', totals.ic, getVar('--cat-input')],
+    ['Output', totals.oc, getVar('--cat-output')],
+    ['Cache read', totals.rc, getVar('--cat-cacheread')],
+    ['Cache write', totals.wc, getVar('--cat-cachewrite')],
+  ];
+  const el = document.getElementById('card-anatomy');
+  el.innerHTML = `
+    <div class="panel-head"><div><h3>Cost anatomy</h3><p class="sub">Share of estimated spend by token category</p></div></div>
+    <div class="stack-bar">${parts.map(([,v,c]) => `<div class="seg-block" style="width:${(v/total*100).toFixed(2)}%; background:${c}"></div>`).join('')}</div>
+    <div class="stack-legend">${parts.map(([label,v,c]) => `<span class="key"><span class="swatch" style="background:${c}"></span>${label}<span class="amt">${fmtUSD(v)}</span><span style="color:var(--muted)">(${fmtPct(v/total)})</span></span>`).join('')}</div>`;
+}
+
+function renderCache(recs) {
+  const byDay = groupSum(recs, r => r.d);
+  const dates = Array.from(byDay.keys()).sort();
+  const el = document.getElementById('card-cache');
+  if (!dates.length) { el.innerHTML = emptyPanel('Cache mechanics', 'No invocations in this window.'); return; }
+  const series = [
+    { label: 'Cache write', color: getVar('--cat-cachewrite'), values: dates.map(d => byDay.get(d).wt) },
+    { label: 'Cache read', color: getVar('--cat-cacheread'), values: dates.map(d => byDay.get(d).rt) },
+    { label: 'Uncached input', color: getVar('--cat-input'), values: dates.map(d => byDay.get(d).it) },
+  ];
+  el.innerHTML = `<div class="panel-head"><div><h3>Input tokens by cache state</h3><p class="sub">Stacked daily volume &mdash; how much of every turn is re-read context</p></div></div><div id="cacheChart"></div>`;
+  document.getElementById('cacheChart').innerHTML = timeSeriesSVG(dates, series, { height: 200, stacked: true, yFmt: fmtTok, xTicks: 6 });
+  attachSeriesTooltip(document.getElementById('cacheChart'), dates, series, { yFmt: fmtTok });
+}
+
+function renderActivity(recs) {
+  const byDay = groupSum(recs, r => r.d);
+  const dates = Array.from(byDay.keys()).sort();
+  const el = document.getElementById('card-activity');
+  if (!dates.length) { el.innerHTML = emptyPanel('Daily activity', 'No invocations in this window.'); return; }
+  const series = [{ label: 'Invocations', color: getVar('--cat-opus'), values: dates.map(d => byDay.get(d).calls) }];
+  el.innerHTML = `<div class="panel-head"><div><h3>Daily invocations</h3><p class="sub">Calls per day across selected teams</p></div></div><div id="activityChart"></div>`;
+  document.getElementById('activityChart').innerHTML = timeSeriesSVG(dates, series, { height: 190, yFmt: fmtInt, xTicks: 8 });
+  attachSeriesTooltip(document.getElementById('activityChart'), dates, series, { yFmt: fmtInt });
+}
+
+const DOW_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function renderHeat(recs) {
+  const grid = Array.from({length:7}, () => new Array(24).fill(0));
+  for (const r of recs) grid[r.w][r.h]++;
+  let max = 1;
+  for (const row of grid) for (const v of row) if (v > max) max = v;
+  const heatVar = i => `var(--heat-${i})`;
+  const colorFor = v => {
+    if (v === 0) return heatVar(0);
+    const t = v / max;
+    const idx = Math.min(6, 1 + Math.floor(t * 5.999));
+    return heatVar(idx);
+  };
+  const el = document.getElementById('card-heat');
+  const rowsHtml = grid.map((row, d) => `
+    <div class="hm-daylabel">${DOW_LABELS[d]}</div>
+    <div class="heatmap-grid">${row.map((v,h) => `<div class="hm-cell" style="background:${colorFor(v)}" title="${DOW_LABELS[d]} ${h}:00 &mdash; ${v} call${v===1?'':'s'}"></div>`).join('')}</div>
+  `).join('');
+  el.innerHTML = `
+    <div class="panel-head"><div><h3>When people work</h3><p class="sub">Invocations by hour &times; weekday, America/New_York</p></div></div>
+    <div class="heatmap-wrap">${rowsHtml}</div>
+    <div class="hm-hourlabels">${[0,4,8,12,16,20].map(h => `<span style="grid-column:span 4">${h}:00</span>`).join('')}</div>
+    <div class="hm-scale">low<span class="ramp">${[0,1,2,3,4,5,6].map(i => `<i style="background:${heatVar(i)}"></i>`).join('')}</span>high</div>`;
+}
+
+function renderTools(recs) {
+  const toolCounts = new Map();
+  const toolUsers = new Map();
+  for (const r of recs) if (r.tl) for (const t of r.tl) {
+    toolCounts.set(t, (toolCounts.get(t) || 0) + 1);
+    if (!toolUsers.has(t)) toolUsers.set(t, new Set());
+    toolUsers.get(t).add(r.u);
+  }
+  const rows = Array.from(toolCounts.entries()).map(([t, c]) => ({ tool: t, calls: c, users: toolUsers.get(t).size })).sort((a, b) => b.calls - a.calls).slice(0, 9);
+  const el = document.getElementById('card-tools');
+  if (!rows.length) { el.innerHTML = emptyPanel('Tool usage', 'No tool calls in this window.'); return; }
+  el.innerHTML = `
+    <div class="panel-head"><div><h3>Most-used tools</h3><p class="sub">Parsed from <code class="mono">tool_use</code> blocks, top ${rows.length}</p></div></div>
+    <div class="hbars">${hbarRows(rows.map(r => ({ label: r.tool, value: r.calls, valueLabel: `${fmtInt(r.calls)} &middot; ${r.users}u`, color: getVar('--cat-haiku') })))}</div>`;
+}
+
+function renderToolDetail(recs) {
+  const toolCounts = new Map();
+  const toolUsers = new Map();
+  let totalCalls = 0;
+  for (const r of recs) if (r.tl) for (const t of r.tl) {
+    totalCalls++;
+    toolCounts.set(t, (toolCounts.get(t) || 0) + 1);
+    if (!toolUsers.has(t)) toolUsers.set(t, new Set());
+    toolUsers.get(t).add(r.u);
+  }
+  const rows = Array.from(toolCounts.entries()).map(([t, c]) => ({ tool: t, calls: c, users: toolUsers.get(t).size, share: totalCalls ? c / totalCalls : 0 })).sort((a, b) => b.calls - a.calls);
+  const el = document.getElementById('card-tool-detail');
+  el.innerHTML = `
+    <div class="panel-head"><div><h3>Tool mix</h3><p class="sub">All tool calls in this window, ${fmtInt(totalCalls)} total</p></div></div>
+    <div class="table-wrap"><table class="dt">
+      <thead><tr><th>Tool</th><th>Calls</th><th>Users</th><th>Share</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><td>${esc(r.tool)}</td><td>${fmtInt(r.calls)}</td><td>${fmtInt(r.users)}</td><td>${fmtPct(r.share)}</td></tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+function emptyPanel(title, msg) {
+  return `<div class="panel-head"><div><h3>${title}</h3></div></div><div class="empty-note">${msg}</div>`;
+}
+function getVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888';
+}
+
+function renderInsights(recs) {
+  const byTeam = groupSum(recs, r => r.t);
+  const teamRows = Array.from(byTeam.entries()).map(([t, b]) => ({ team: t, cost: b.cost })).sort((a, b) => b.cost - a.cost);
+  const totalCost = teamRows.reduce((a, r) => a + r.cost, 0) || 1;
+  const topTeam = teamRows[0];
+  const totals = recs.reduce((a, r) => { a.rc += r.rc; a.wc += r.wc; a.ic += r.ic; a.oc += r.oc; return a; }, { ic: 0, oc: 0, rc: 0, wc: 0 });
+  const cacheShare = (totals.rc + totals.wc) / ((totals.ic + totals.oc + totals.rc + totals.wc) || 1);
+
+  document.getElementById('insight-spend').innerHTML = topTeam
+    ? `<strong>${esc(topTeam.team)}</strong> accounts for ${fmtPct(topTeam.cost / totalCost)} of estimated spend in this window (${fmtUSD(topTeam.cost)} of ${fmtUSD(totalCost)}).`
+    : 'No spend recorded in this window.';
+
+  document.getElementById('insight-cost').innerHTML =
+    `Cache reads and writes make up <strong>${fmtPct(cacheShare)}</strong> of estimated spend &mdash; the recurring cost of re-sending context on every turn, not the cost of what users type.`;
+
+  const byUser = groupSum(recs, r => r.u);
+  const sess = sessionsByUser(recs);
+  const totalSessions = Array.from(sess.values()).reduce((a, b) => a + b, 0);
+  const activeDays = new Set(recs.map(r => r.d)).size;
+  document.getElementById('insight-usage').innerHTML = byUser.size
+    ? `${fmtInt(byUser.size)} users ran <strong>${fmtInt(totalSessions)}</strong> sessions across <strong>${fmtInt(activeDays)}</strong> active days in this window &mdash; about ${byUser.size ? (totalSessions / byUser.size).toFixed(1) : '0'} sessions per user.`
+    : 'No activity recorded in this window.';
+}
+
+/* ---------------- static narrative content ---------------- */
+function renderSkillsPlaceholder() {
+  const rows = [
+    ['Repeated file-edit + test-run loop', '&mdash;', '&mdash;', 'Package as a project skill once prompts are classified'],
+    ['Boilerplate scaffolding requests', '&mdash;', '&mdash;', 'Candidate for a shared template / slash command'],
+    ['Log or data investigation walkthroughs', '&mdash;', '&mdash;', 'Candidate for a reusable analysis skill'],
+  ];
+  document.getElementById('skillsBody').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+}
+
+/* ---------------- section 05: in office vs. remote ---------------- */
+const OFFICE_DOWS = new Set([0, 1, 2]);   // Mon, Tue, Wed
+const REMOTE_DOWS = new Set([3, 4]);      // Thu, Fri
+
+function locationGroupStats(recs, dowSet) {
+  const sub = recs.filter(r => dowSet.has(r.w));
+  const days = new Set(sub.map(r => r.d));
+  const users = new Set(sub.map(r => r.u));
+  const cost = sub.reduce((a, r) => a + r.ic + r.oc + r.rc + r.wc, 0);
+  const it = sub.reduce((a, r) => a + r.it, 0);
+  const rt = sub.reduce((a, r) => a + r.rt, 0);
+  const wt = sub.reduce((a, r) => a + r.wt, 0);
+  const totalSessions = Array.from(sessionsByUser(sub).values()).reduce((a, b) => a + b, 0);
+  const activeDays = days.size;
+  const denom = activeDays || 1;
+  return {
+    calls: sub.length, activeDays, users: users.size, cost,
+    callsPerDay: sub.length / denom, costPerDay: cost / denom, sessionsPerDay: totalSessions / denom,
+    cacheShare: (it + rt + wt) ? (rt + wt) / (it + rt + wt) : 0,
+  };
+}
+
+function renderWeekPattern(recs) {
+  const perDow = Array.from({ length: 7 }, () => ({ calls: 0, days: new Set() }));
+  for (const r of recs) { perDow[r.w].calls++; perDow[r.w].days.add(r.d); }
+  const weekendTotal = perDow[5].calls + perDow[6].calls;
+  const items = DOW_LABELS.map((label, i) => {
+    const b = perDow[i];
+    const avg = b.days.size ? b.calls / b.days.size : 0;
+    const color = i <= 2 ? getVar('--cat-opus') : i <= 4 ? getVar('--cat-sonnet') : getVar('--cat-other');
+    return { label, value: avg, valueLabel: b.days.size ? avg.toFixed(1) + '/day' : '&mdash;', color };
+  });
+  document.getElementById('card-week-pattern').innerHTML = `
+    <div class="panel-head"><div><h3>Average invocations per weekday</h3><p class="sub">Calls per active day, by day of week, selected window</p></div></div>
+    <div class="hbars">${hbarRows(items)}</div>
+    <div class="legend">
+      <span class="key"><span class="swatch" style="background:${getVar('--cat-opus')}"></span>In office (Mon&ndash;Wed)</span>
+      <span class="key"><span class="swatch" style="background:${getVar('--cat-sonnet')}"></span>Remote (Thu&ndash;Fri)</span>
+      ${weekendTotal ? `<span class="key"><span class="swatch" style="background:${getVar('--cat-other')}"></span>Weekend (${fmtInt(weekendTotal)} calls observed)</span>` : ''}
+    </div>`;
+}
+
+function renderOfficeRemoteCompare(office, remote) {
+  const rows = [
+    ['Active days', fmtInt(office.activeDays), fmtInt(remote.activeDays)],
+    ['Invocations / active day', office.callsPerDay.toFixed(1), remote.callsPerDay.toFixed(1)],
+    ['Cost / active day', fmtUSDp(office.costPerDay), fmtUSDp(remote.costPerDay)],
+    ['Sessions / active day', office.sessionsPerDay.toFixed(1), remote.sessionsPerDay.toFixed(1)],
+    ['Active users', fmtInt(office.users), fmtInt(remote.users)],
+    ['Cache share of input tokens', fmtPct(office.cacheShare), fmtPct(remote.cacheShare)],
+  ];
+  document.getElementById('card-office-remote').innerHTML = `
+    <div class="panel-head"><div><h3>In office vs. remote</h3><p class="sub">Mon&ndash;Wed vs Thu&ndash;Fri, selected window</p></div></div>
+    <div class="table-wrap"><table class="dt">
+      <thead><tr><th>Metric</th><th>In office</th><th>Remote</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+function renderOfficeRemoteHours(recs) {
+  const officeRecs = recs.filter(r => OFFICE_DOWS.has(r.w));
+  const remoteRecs = recs.filter(r => REMOTE_DOWS.has(r.w));
+  const officeDays = new Set(officeRecs.map(r => r.d)).size || 1;
+  const remoteDays = new Set(remoteRecs.map(r => r.d)).size || 1;
+  const officeByHour = new Array(24).fill(0);
+  const remoteByHour = new Array(24).fill(0);
+  for (const r of officeRecs) officeByHour[r.h]++;
+  for (const r of remoteRecs) remoteByHour[r.h]++;
+  const hours = Array.from({ length: 24 }, (_, i) => String(i));
+  const series = [
+    { label: 'In office', color: getVar('--cat-opus'), values: officeByHour.map(v => v / officeDays) },
+    { label: 'Remote', color: getVar('--cat-sonnet'), values: remoteByHour.map(v => v / remoteDays) },
+  ];
+  const el = document.getElementById('card-office-remote-hours');
+  el.innerHTML = `<div class="panel-head"><div><h3>Hour-of-day pattern</h3><p class="sub">Avg invocations per active day, by hour (America/New_York)</p></div></div><div id="officeRemoteHourChart"></div>
+    <div class="legend">
+      <span class="key"><span class="swatch" style="background:${getVar('--cat-opus')}"></span>In office</span>
+      <span class="key"><span class="swatch" style="background:${getVar('--cat-sonnet')}"></span>Remote</span>
+    </div>`;
+  const yFmt = v => v.toFixed(1);
+  const xFmt = h => h + ':00';
+  document.getElementById('officeRemoteHourChart').innerHTML = timeSeriesSVG(hours, series, { height: 190, yFmt, xTicks: 6, xFmt });
+  attachSeriesTooltip(document.getElementById('officeRemoteHourChart'), hours, series, { yFmt, xFmt });
+}
+
+function renderOfficeRemote(recs) {
+  const office = locationGroupStats(recs, OFFICE_DOWS);
+  const remote = locationGroupStats(recs, REMOTE_DOWS);
+  renderWeekPattern(recs);
+  renderOfficeRemoteCompare(office, remote);
+  renderOfficeRemoteHours(recs);
+
+  const el = document.getElementById('insight-office-remote');
+  if (!office.activeDays || !remote.activeDays) {
+    el.innerHTML = 'Not enough data in this window to compare in-office and remote days.';
+    return;
+  }
+  const diff = remote.callsPerDay - office.callsPerDay;
+  const pct = office.callsPerDay ? Math.abs(diff / office.callsPerDay * 100) : 0;
+  const dir = diff >= 0 ? 'higher' : 'lower';
+  el.innerHTML = `Remote days (Thu&ndash;Fri) average <strong>${remote.callsPerDay.toFixed(1)}</strong> invocations per active day versus <strong>${office.callsPerDay.toFixed(1)}</strong> in office &mdash; ${pct.toFixed(0)}% ${dir}. Estimated cost per active day runs <strong>${fmtUSDp(remote.costPerDay)}</strong> remote versus <strong>${fmtUSDp(office.costPerDay)}</strong> in office.`;
+}
+
+/* ---------------- top-level render ---------------- */
+function renderAll() {
+  const recs = filteredRecords();
+  renderKPIs(recs);
+  renderDaily(recs);
+  renderUsers(recs);
+  renderTeams(recs);
+  renderAnatomy(recs);
+  renderCache(recs);
+  renderActivity(recs);
+  renderHeat(recs);
+  renderTools(recs);
+  renderToolDetail(recs);
+  renderInsights(recs);
+  renderOfficeRemote(recs);
+
+  const label = state.rangeDays === 'full' ? 'full pilot' : `last ${state.rangeDays} days`;
+  document.getElementById('rangeNote').textContent = `${fmtDate(DATA.kpis.pilot_start)} – ${fmtDate(DATA.kpis.pilot_end)} · showing ${label}`;
+}
+
+/* ---------------- filter wiring ---------------- */
+document.getElementById('rangeSeg').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#rangeSeg button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  btn.setAttribute('aria-pressed', 'true');
+  const d = btn.getAttribute('data-days');
+  state.rangeDays = d === 'full' ? 'full' : +d;
+  renderAll();
+});
+
+function buildTeamChips() {
+  const el = document.getElementById('teamChips');
+  el.innerHTML = ALL_TEAMS.map(t => `<button class="chip" data-team="${esc(t)}" aria-pressed="true">${esc(t)}</button>`).join('');
+  el.addEventListener('click', e => {
+    const btn = e.target.closest('.chip');
+    if (!btn) return;
+    const t = btn.getAttribute('data-team');
+    const pressed = btn.getAttribute('aria-pressed') === 'true';
+    if (pressed) { state.teams.delete(t); btn.setAttribute('aria-pressed', 'false'); }
+    else { state.teams.add(t); btn.setAttribute('aria-pressed', 'true'); }
+    renderAll();
+  });
+}
+
+/* ---------------- boot ---------------- */
+document.getElementById('registerNo').textContent = 'Compiled ' + DATA.meta.generated_at.slice(0, 10);
+document.getElementById('footerNote').innerHTML = `<strong>About this register.</strong> Built from AWS Bedrock model-invocation logs for the Boston Claude Code pilot (${fmtDate(DATA.kpis.pilot_start)} &ndash; ${fmtDate(DATA.kpis.pilot_end)}, 2026). Spend is <em>estimated</em> from token counts at Bedrock on-demand list prices (cache reads at 0.1&times; the model's input rate, cache writes at 1.25&times; for the 5-minute ephemeral cache) and grouped by model family &mdash; confirm against the AWS bill for exact figures. Sessions are runs of activity with less than 30 minutes between invocations; a session may be truncated at a filter window's edge. Tool usage is parsed from <code>tool_use</code> blocks in response payloads &mdash; no prompt or response text is read. Excluded throughout: ${fmtInt(DATA.excluded.no_team_tag)} invocations from IAM users with no <code>Team</code> tag (service/shared/test logins), ${fmtInt(DATA.excluded.credential_pings)} one-token credential-check pings, and ${fmtInt(DATA.excluded.errored)} errored invocations. Section 04's skills table is an illustrative placeholder pending a prompt-classification pass.`;
+
+buildTeamChips();
+renderSkillsPlaceholder();
+renderAll();
+</script>
+</body>
+</html>
